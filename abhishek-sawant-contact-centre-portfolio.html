@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abhishek Sawant | Customer Experience Command Centre</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070b14;--panel:#0f1626;--panel2:#141d31;--line:#22304d;--text:#e8ecf6;--muted:#8d98b3;
+--blue:#3b82f6;--cyan:#22d3ee;--green:#22c55e;--amber:#f59e0b;--pink:#ec4899;--violet:#8b5cf6}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);line-height:1.55;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:
+radial-gradient(circle at 15% 10%,rgba(59,130,246,.18),transparent 40%),
+radial-gradient(circle at 85% 30%,rgba(34,211,238,.12),transparent 40%),
+linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px) 0 0/40px 40px,
+linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px) 0 0/40px 40px}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1200px;margin:0 auto;padding:0 22px}
+.mono{font-family:"JetBrains Mono",monospace}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px}
+.live{display:inline-flex;align-items:center;gap:7px;font-size:.72rem;font-weight:700;letter-spacing:.1em;color:var(--green)}
+.live::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 1.6s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.7)}70%{box-shadow:0 0 0 9px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+
+/* Top status bar */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(7,11,20,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:62px;gap:14px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800}
+.brand .hs{font-size:1.4rem}
+.status{display:flex;align-items:center;gap:8px;font-size:.82rem;background:var(--panel2);border:1px solid var(--line);padding:6px 12px;border-radius:999px;cursor:pointer;user-select:none}
+.status i{width:9px;height:9px;border-radius:50%;background:var(--green)}
+.navlinks{display:flex;gap:6px}
+.navlinks a{font-size:.83rem;color:var(--muted);padding:7px 12px;border-radius:9px}
+.navlinks a:hover,.navlinks a.on{background:var(--panel2);color:var(--text)}
+.clock{font-size:.8rem;color:var(--muted)}
+
+/* Hero = agent desktop */
+.hero{padding:40px 0 70px}
+.hero-grid{display:grid;grid-template-columns:1.05fr 1fr;gap:26px;align-items:stretch}
+.intro{padding:34px}
+.intro .tag{font-size:.78rem;color:var(--cyan);letter-spacing:.12em}
+.intro h1{font-size:clamp(2.2rem,4.6vw,3.5rem);line-height:1.05;letter-spacing:-.03em;margin:14px 0}
+.intro h1 span{background:linear-gradient(90deg,var(--blue),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+.intro p{color:var(--muted);font-size:1.03rem;margin-bottom:22px}
+.promise{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px}
+.promise div{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:.8rem;color:var(--muted)}
+.promise b{display:block;color:var(--text);font-size:.92rem}
+.btns{display:flex;gap:10px;flex-wrap:wrap}
+.btn{padding:12px 20px;border-radius:12px;font-weight:600;font-size:.92rem;border:none;cursor:pointer;display:inline-flex;gap:8px;align-items:center;transition:transform .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn-g{background:var(--green);color:#04210f}
+.btn-o{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
+
+/* Live chat widget */
+.chat{display:flex;flex-direction:column;overflow:hidden;min-height:520px}
+.chat-h{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line);background:var(--panel2)}
+.av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--cyan));display:grid;place-items:center;font-weight:800;font-size:.9rem;flex:none}
+.chat-h small{color:var(--muted);font-size:.76rem;display:block}
+.ch-icons{margin-left:auto;display:flex;gap:6px}
+.ch-icons span{font-size:.7rem;padding:4px 8px;border-radius:7px;background:var(--bg);border:1px solid var(--line);color:var(--muted)}
+.msgs{flex:1;padding:18px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;max-height:380px;scroll-behavior:smooth}
+.m{max-width:82%;padding:10px 14px;border-radius:16px;font-size:.9rem;animation:pop .35s ease}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.97)}}
+.m.bot{background:var(--panel2);border:1px solid var(--line);border-bottom-left-radius:4px}
+.m.user{align-self:flex-end;background:var(--blue);color:#fff;border-bottom-right-radius:4px}
+.m.sys{align-self:center;font-size:.72rem;color:var(--muted);background:none;padding:2px}
+.typing{display:inline-flex;gap:4px}.typing i{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:bounce 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes bounce{50%{transform:translateY(-5px)}}
+.quick{display:flex;flex-wrap:wrap;gap:7px;padding:12px 18px;border-top:1px solid var(--line)}
+.quick button{background:transparent;border:1px solid var(--blue);color:var(--cyan);padding:7px 12px;border-radius:999px;font-size:.8rem;cursor:pointer;font-family:inherit}
+.quick button:hover{background:var(--blue);color:#fff}
+.inp{display:flex;gap:8px;padding:12px 18px;border-top:1px solid var(--line)}
+.inp input{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;color:var(--text);font-family:inherit}
+.inp button{background:var(--blue);border:none;color:#fff;border-radius:10px;padding:0 16px;cursor:pointer;font-weight:600}
+
+/* KPI wallboard */
+.wall{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:26px}
+.kpi{padding:16px 18px}
+.kpi small{color:var(--muted);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase}
+.kpi b{display:block;font-size:1.7rem;font-weight:800;margin-top:4px}
+.kpi .spark{height:28px;margin-top:6px;display:flex;align-items:flex-end;gap:3px}
+.kpi .spark i{flex:1;background:var(--blue);opacity:.6;border-radius:2px;transition:height .6s}
+.note{font-size:.72rem;color:var(--muted);margin-top:10px;text-align:right}
+
+section{padding:90px 0}
+.eyebrow{font-size:.78rem;color:var(--cyan);letter-spacing:.14em}
+h2{font-size:clamp(1.8rem,3.4vw,2.5rem);letter-spacing:-.02em;margin:8px 0 12px}
+.sub{color:var(--muted);max-width:640px;margin-bottom:38px}
+.reveal{opacity:0;transform:translateY(26px);transition:all .8s cubic-bezier(.2,.7,.2,1)}
+.reveal.show{opacity:1;transform:none}
+
+/* IVR */
+.ivr{display:grid;grid-template-columns:320px 1fr;gap:24px}
+.phone{padding:24px;text-align:center}
+.screen{background:#020617;border:1px solid var(--line);border-radius:12px;padding:14px;min-height:92px;text-align:left;font-size:.82rem;color:var(--green);margin-bottom:18px}
+.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.keys button{height:54px;border-radius:14px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font-size:1.2rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+.keys button small{display:block;font-size:.55rem;color:var(--muted);font-weight:500}
+.keys button:active,.keys button.hit{background:var(--blue);transform:scale(.95)}
+.ivr-out{padding:30px;min-height:360px}
+.ivr-out h3{font-size:1.4rem;margin-bottom:10px}
+.ivr-out p{color:var(--muted)}
+.ivr-out ul{margin:14px 0 0 18px;color:var(--muted)}
+.ivr-out li{margin-bottom:6px}
+.ivr-out li b{color:var(--text)}
+
+/* Routing */
+.route{position:relative;padding:30px;overflow:hidden}
+.route svg{width:100%;height:auto;display:block}
+.flow{stroke-dasharray:6 8;animation:dash 1.2s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-28}}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-size:.82rem;color:var(--muted)}
+
+/* Case history */
+.cases{display:grid;gap:14px}
+.case{padding:20px 22px;cursor:pointer;transition:border-color .2s,transform .2s;display:grid;grid-template-columns:110px 1fr auto;gap:18px;align-items:start}
+.case:hover{border-color:var(--blue);transform:translateX(4px)}
+.cid{font-size:.75rem;color:var(--muted)}
+.case h3{font-size:1.05rem}
+.case .org{color:var(--cyan);font-size:.86rem;font-weight:600}
+.pill{font-size:.7rem;font-weight:700;padding:5px 10px;border-radius:999px;letter-spacing:.06em;white-space:nowrap}
+.p-open{background:rgba(34,197,94,.15);color:var(--green)}
+.p-res{background:rgba(139,92,246,.15);color:#c4b5fd}
+.case .more{grid-column:2/4;max-height:0;overflow:hidden;transition:max-height .4s;color:var(--muted);font-size:.9rem}
+.case.open .more{max-height:300px}
+.case ul{margin:6px 0 0 18px}
+
+/* Skills queues */
+.queues{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.q{padding:20px}
+.q h4{display:flex;justify-content:space-between;align-items:center;font-size:.98rem;margin-bottom:12px}
+.q h4 span{font-size:1.3rem}
+.q .chip{display:inline-block;font-size:.76rem;padding:5px 10px;border-radius:8px;background:var(--panel2);border:1px solid var(--line);margin:0 6px 6px 0;transition:all .2s}
+.q .chip:hover{border-color:var(--cyan);color:var(--cyan)}
+
+/* CSAT award */
+.award{display:flex;gap:22px;align-items:center;padding:28px;margin-top:22px;background:linear-gradient(120deg,rgba(245,158,11,.14),var(--panel))}
+.award .t{font-size:3rem}
+.stars{color:var(--amber);letter-spacing:3px}
+
+/* Feedback */
+.fb{text-align:center;padding:50px 26px}
+.faces{display:flex;justify-content:center;gap:14px;margin:22px 0}
+.faces button{font-size:2.2rem;background:var(--panel2);border:1px solid var(--line);border-radius:16px;width:70px;height:70px;cursor:pointer;transition:transform .2s}
+.faces button:hover{transform:scale(1.15)}
+#fbMsg{color:var(--cyan);min-height:1.4em;font-weight:600}
+
+footer{text-align:center;color:var(--muted);font-size:.82rem;padding:34px 0;border-top:1px solid var(--line)}
+
+/* Floating launcher */
+#launcher{position:fixed;right:22px;bottom:22px;width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--cyan));border:none;font-size:1.5rem;cursor:pointer;box-shadow:0 10px 30px rgba(59,130,246,.5);z-index:60}
+#launcher::after{content:"1";position:absolute;top:2px;right:2px;background:var(--pink);color:#fff;font-size:.7rem;font-weight:700;width:18px;height:18px;border-radius:50%;display:grid;place-items:center}
+#toast{position:fixed;left:50%;bottom:30px;transform:translate(-50%,120px);background:var(--panel2);border:1px solid var(--line);padding:12px 18px;border-radius:12px;font-size:.88rem;transition:transform .4s;z-index:70}
+#toast.show{transform:translate(-50%,0)}
+
+@media(max-width:960px){
+ .hero-grid,.ivr{grid-template-columns:1fr}
+ .wall{grid-template-columns:repeat(2,1fr)}
+ .queues{grid-template-columns:repeat(2,1fr)}
+ .navlinks,.clock{display:none}
+ .case{grid-template-columns:1fr}.case .more{grid-column:1}
+}
+@media(max-width:560px){.queues,.promise{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+ <div class="wrap">
+  <a href="#home" class="brand"><span class="hs">🎧</span> Abhishek Sawant <span class="mono" style="color:var(--muted);font-weight:400;font-size:.8rem">// CX Desk</span></a>
+  <div class="navlinks">
+   <a href="#ivr">IVR Menu</a><a href="#routing">Routing</a><a href="#cases">Case History</a><a href="#skills">Skills</a><a href="#feedback">Feedback</a>
+  </div>
+  <span class="clock mono" id="clock"></span>
+  <div class="status" id="status" title="Click to change status"><i id="sdot"></i><span id="stxt">Available</span></div>
+ </div>
+</div>
+
+<!-- HERO / AGENT DESKTOP -->
+<header class="hero" id="home">
+ <div class="wrap">
+  <div class="hero-grid">
+   <div class="panel intro reveal">
+    <div class="tag mono">INCOMING CONNECTION · HAMBURG, DE</div>
+    <h1>Every conversation<br>is a <span>customer moment.</span></h1>
+    <p>I'm <b style="color:var(--text)">Abhishek Sawant</b>, Delivery Architect – Lead at Sprinklr. I design contact centres where customers get answers fast, AI handles the routine, and human agents shine when it matters most.</p>
+    <div class="promise">
+     <div><b>🗣️ Heard</b>Any channel, one journey</div>
+     <div><b>⚡ Resolved</b>Smart AI + routing</div>
+     <div><b>🤝 Human</b>Seamless agent hand-off</div>
+    </div>
+    <div class="btns">
+     <a class="btn btn-g" href="https://www.linkedin.com/in/abhishekdsawant/" target="_blank" rel="noopener">📞 Connect on LinkedIn</a>
+     <a class="btn btn-o" href="#ivr">☎️ Dial the IVR</a>
+    </div>
+   </div>
+
+   <div class="panel chat reveal">
+    <div class="chat-h">
+     <div class="av">AS</div>
+     <div><b>Abhishek's AI Agent</b><small><span class="live">ONLINE</span> · usually replies instantly</small></div>
+     <div class="ch-icons"><span>💬 Chat</span><span>📱 WA</span><span>📞 Voice</span></div>
+    </div>
+    <div class="msgs" id="msgs"></div>
+    <div class="quick" id="quick"></div>
+    <form class="inp" id="form"><input id="q" placeholder="Ask me anything… e.g. 'What do you do?'" autocomplete="off"><button>Send</button></form>
+   </div>
+  </div>
+
+  <div class="wall">
+   <div class="panel kpi reveal"><small>Channels unified</small><b id="k1">0</b><div class="spark"></div></div>
+   <div class="panel kpi reveal"><small>Customer focus</small><b style="color:var(--green)">100%</b><div class="spark"></div></div>
+   <div class="panel kpi reveal"><small>Conversations routed</small><b id="k3" class="mono">0</b><div class="spark"></div></div>
+   <div class="panel kpi reveal"><small>Languages delivered</small><b>EN·DE·FR·IT</b><div class="spark"></div></div>
+   <div class="panel kpi reveal"><small>Queue wait</small><b style="color:var(--cyan)" id="k5">0s</b><div class="spark"></div></div>
+  </div>
+  <div class="note mono">* Live demo wallboard: animated for illustration, not real data</div>
+ </div>
+</header>
+
+<!-- IVR -->
+<section id="ivr">
+ <div class="wrap">
+  <div class="eyebrow mono">01 · SELF-SERVICE</div>
+  <h2>Thank you for calling. Please choose an option.</h2>
+  <p class="sub">Great IVRs get customers to the right place in seconds. Try mine. Each key opens part of my story.</p>
+  <div class="ivr">
+   <div class="panel phone reveal">
+    <div class="screen mono" id="screen">📞 Connected 00:00<br>Welcome! Press a key…</div>
+    <div class="keys" id="keys"></div>
+   </div>
+   <div class="panel ivr-out reveal" id="ivrOut"></div>
+  </div>
+ </div>
+</section>
+
+<!-- ROUTING -->
+<section id="routing" style="padding-top:20px">
+ <div class="wrap">
+  <div class="eyebrow mono">02 · OMNICHANNEL ROUTING</div>
+  <h2>One customer. Every channel. One journey.</h2>
+  <p class="sub">This is how I think about architecture. Every channel feeds one intelligent layer. AI resolves what it can, and the right human picks up the rest with full context.</p>
+  <div class="panel route reveal">
+   <svg viewBox="0 0 1000 380" id="routeSvg">
+    <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#3b82f6"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs>
+    <!-- channels -->
+    <g font-family="Inter" font-size="14" fill="#e8ecf6">
+     <g><rect x="20" y="20" width="160" height="46" rx="12" fill="#141d31" stroke="#22304d"/><text x="44" y="49">📞 Voice / IVR</text></g>
+     <g><rect x="20" y="90" width="160" height="46" rx="12" fill="#141d31" stroke="#22304d"/><text x="44" y="119">💬 Live Chat</text></g>
+     <g><rect x="20" y="160" width="160" height="46" rx="12" fill="#141d31" stroke="#22304d"/><text x="44" y="189">📱 WhatsApp</text></g>
+     <g><rect x="20" y="230" width="160" height="46" rx="12" fill="#141d31" stroke="#22304d"/><text x="44" y="259">✉️ Email</text></g>
+     <g><rect x="20" y="300" width="160" height="46" rx="12" fill="#141d31" stroke="#22304d"/><text x="44" y="329">🌐 Social</text></g>
+    </g>
+    <g stroke="url(#g)" stroke-width="2" fill="none" class="flow">
+     <path d="M180 43 C 300 43, 300 190, 400 190"/><path d="M180 113 C 300 113, 300 190, 400 190"/>
+     <path d="M180 183 L 400 190"/><path d="M180 253 C 300 253, 300 190, 400 190"/><path d="M180 323 C 300 323, 300 190, 400 190"/>
+    </g>
+    <!-- hub -->
+    <circle cx="480" cy="190" r="80" fill="#0f1626" stroke="url(#g)" stroke-width="3"/>
+    <circle cx="480" cy="190" r="96" fill="none" stroke="#22d3ee" stroke-opacity=".25"><animate attributeName="r" values="82;110;82" dur="3s" repeatCount="indefinite"/><animate attributeName="stroke-opacity" values=".5;0;.5" dur="3s" repeatCount="indefinite"/></circle>
+    <text x="480" y="182" text-anchor="middle" fill="#e8ecf6" font-family="Inter" font-weight="800" font-size="17">🧠 AI Agent</text>
+    <text x="480" y="204" text-anchor="middle" fill="#8d98b3" font-family="Inter" font-size="12">Intent · Routing · Context</text>
+    <g stroke="url(#g)" stroke-width="2" fill="none" class="flow">
+     <path d="M560 190 C 660 190, 660 80, 760 80"/><path d="M560 190 L 760 190"/><path d="M560 190 C 660 190, 660 300, 760 300"/>
+    </g>
+    <g font-family="Inter" font-size="14" fill="#e8ecf6">
+     <rect x="760" y="55" width="220" height="50" rx="12" fill="rgba(34,197,94,.12)" stroke="#22c55e"/><text x="780" y="86">✅ Self-served by AI</text>
+     <rect x="760" y="165" width="220" height="50" rx="12" fill="rgba(59,130,246,.12)" stroke="#3b82f6"/><text x="780" y="196">🧑‍💼 Skilled human agent</text>
+     <rect x="760" y="275" width="220" height="50" rx="12" fill="rgba(139,92,246,.12)" stroke="#8b5cf6"/><text x="780" y="306">🔌 CRM / backend action</text>
+    </g>
+    <g id="dots"></g>
+   </svg>
+   <div class="legend"><span>🟢 Moving dots = live customer conversations</span><span>🧠 Fallback &amp; escalation built in</span><span>🛡️ Governed across environments</span></div>
+  </div>
+ </div>
+</section>
+
+<!-- CASE HISTORY -->
+<section id="cases">
+ <div class="wrap">
+  <div class="eyebrow mono">03 · CASE HISTORY</div>
+  <h2>My career, logged as tickets</h2>
+  <p class="sub">Every role solved a bigger problem for customers. Click a case to open it.</p>
+  <div class="cases">
+   <div class="panel case open reveal">
+    <div class="cid mono">#CX-0005<br>Priority: P1</div>
+    <div><h3>Delivery Architect – Lead</h3><div class="org">Sprinklr · Hamburg, Germany</div></div>
+    <span class="pill p-open">● IN PROGRESS</span>
+    <div class="more"><ul>
+     <li>Architect enterprise omnichannel CCaaS: Voice/IVR, Live Chat, WhatsApp and digital.</li>
+     <li>Design AI Agents with routing, fallback and human escalation, so no customer gets stuck.</li>
+     <li>Own integrations, reporting, environment governance and platform health at scale.</li>
+     <li>Lead customer workshops, RFIs and executive sessions as part of the TPA practice.</li>
+    </ul></div>
+   </div>
+   <div class="panel case reveal">
+    <div class="cid mono">#CX-0004<br>Priority: P1</div>
+    <div><h3>Senior Implementation Consultant</h3><div class="org">Sprinklr · EU CCaaS</div></div>
+    <span class="pill p-res">✔ RESOLVED · PROMOTED</span>
+    <div class="more"><ul>
+     <li>Delivered CCaaS programmes for enterprise brands across Europe.</li>
+     <li>🏆 Senior Implementation Consultant of the Quarter: Q1 FY2026, Business Excellence.</li>
+    </ul></div>
+   </div>
+   <div class="panel case reveal">
+    <div class="cid mono">#CX-0003<br>Priority: P2</div>
+    <div><h3>Implementation Consultant</h3><div class="org">Sprinklr · 2022</div></div>
+    <span class="pill p-res">✔ RESOLVED · PROMOTED</span>
+    <div class="more"><ul><li>Moved from support into delivery. Configured and launched customer-care solutions, bots and channel integrations.</li></ul></div>
+   </div>
+   <div class="panel case reveal">
+    <div class="cid mono">#CX-0002<br>Priority: P2</div>
+    <div><h3>Product Support Engineer</h3><div class="org">Sprinklr · 2021 – 2022</div></div>
+    <span class="pill p-res">✔ RESOLVED · ESCALATED UP</span>
+    <div class="more"><ul><li>Resolved complex platform issues for enterprise customers and learned the platform from the inside out.</li></ul></div>
+   </div>
+   <div class="panel case reveal">
+    <div class="cid mono">#CX-0001<br>Priority: P3</div>
+    <div><h3>Executive Technical Engineer</h3><div class="org">Indian Institute of Technology Dharwad · 2020 – 2021</div></div>
+    <span class="pill p-res">✔ RESOLVED</span>
+    <div class="more"><ul><li>Where it all started: my first professional technical engineering role.</li></ul></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills" style="padding-top:20px">
+ <div class="wrap">
+  <div class="eyebrow mono">04 · SKILL-BASED ROUTING</div>
+  <h2>Which queue should your challenge go to?</h2>
+  <p class="sub">These are my skill groups. Any of them can pick up your conversation.</p>
+  <div class="queues">
+   <div class="panel q reveal"><h4>AI &amp; Automation <span>🤖</span></h4>
+    <span class="chip">Agentic AI</span><span class="chip">GenAI Chatbots</span><span class="chip">Prompt Engineering</span><span class="chip">Intent Routing</span><span class="chip">Guardrails</span></div>
+   <div class="panel q reveal"><h4>Voice &amp; Channels <span>📞</span></h4>
+    <span class="chip">IVR Design</span><span class="chip">Speech-to-Text</span><span class="chip">Live Chat</span><span class="chip">WhatsApp</span><span class="chip">Bot-to-Agent Hand-off</span></div>
+   <div class="panel q reveal"><h4>Platform &amp; Integration <span>🏗️</span></h4>
+    <span class="chip">REST APIs</span><span class="chip">CRM Integration</span><span class="chip">Custom Code</span><span class="chip">Reporting</span><span class="chip">Sandbox Governance</span></div>
+   <div class="panel q reveal"><h4>Customer Leadership <span>🤝</span></h4>
+    <span class="chip">Workshops &amp; RFIs</span><span class="chip">Exec Talk Tracks</span><span class="chip">SOW &amp; Scoping</span><span class="chip">Escalation Mgmt</span><span class="chip">Multilingual Delivery</span></div>
+  </div>
+  <div class="panel award reveal">
+   <div class="t">🏆</div>
+   <div><div class="stars">★★★★★</div><h3>Senior Implementation Consultant of the Quarter</h3><p style="color:var(--muted)">Q1 FY2026 · Business Excellence · EU CCaaS IC Team, Sprinklr</p></div>
+  </div>
+ </div>
+</section>
+
+<!-- FEEDBACK / CONTACT -->
+<section id="feedback">
+ <div class="wrap">
+  <div class="panel fb reveal">
+   <div class="eyebrow mono">05 · POST-INTERACTION SURVEY</div>
+   <h2>How was your experience today?</h2>
+   <p style="color:var(--muted)">No contact centre is complete without a CSAT survey 😉</p>
+   <div class="faces">
+    <button data-v="1">😞</button><button data-v="2">😐</button><button data-v="3">🙂</button><button data-v="4">😄</button><button data-v="5">🤩</button>
+   </div>
+   <div id="fbMsg"></div>
+   <div class="btns" style="justify-content:center;margin-top:20px">
+    <a class="btn btn-g" href="https://www.linkedin.com/in/abhishekdsawant/" target="_blank" rel="noopener">💬 Start a conversation on LinkedIn</a>
+   </div>
+  </div>
+ </div>
+</section>
+
+<footer>© <span id="yr"></span> Abhishek Sawant · Hamburg, Germany · Designing customer moments that matter</footer>
+<button id="launcher" title="Chat with me">💬</button>
+<div id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const LI="https://www.linkedin.com/in/abhishekdsawant/";
+
+/* Clock + status */
+setInterval(()=>$('#clock').textContent='CET '+new Date().toLocaleTimeString('en-GB',{timeZone:'Europe/Berlin'}),1000);
+const states=[["Available","#22c55e"],["In a workshop","#f59e0b"],["Designing AI flows","#8b5cf6"],["Available","#22c55e"]];let si=0;
+$('#status').onclick=()=>{si=(si+1)%states.length;$('#stxt').textContent=states[si][0];$('#sdot').style.background=states[si][1];toast('Status changed: '+states[si][0])};
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),2200)}
+
+/* Chat bot */
+const KB={
+ about:"I'm Abhishek, Delivery Architect – Lead at Sprinklr, based in Hamburg 🇩🇪. I design omnichannel contact centres that put the customer first.",
+ do:"I architect CCaaS solutions: Voice/IVR, Live Chat, WhatsApp, AI Agents, integrations and governance. I make sure customers are helped quickly on any channel. 🎧",
+ ai:"Agentic AI is my favourite area 🤖. I design AI Agents with smart intent routing, guardrails, fallbacks and smooth hand-off to humans, so nobody gets stuck in a bot loop.",
+ career:"Here's my journey: IIT Dharwad (2020) → Product Support Engineer (2021) → Implementation Consultant (2022) → Senior Implementation Consultant → Delivery Architect – Lead. Scroll to 'Case History' for details!",
+ award:"🏆 I was named Senior Implementation Consultant of the Quarter (Q1 FY2026, Business Excellence) in Sprinklr's EU CCaaS team.",
+ contact:"I'm transferring you to a live channel 😊 The best way to reach me is LinkedIn. Click 'Connect on LinkedIn' at the top.",
+ cx:"My philosophy: customers shouldn't have to repeat themselves. One journey across all channels, AI for speed, humans for empathy, and context that flows everywhere.",
+ hi:"Hi there! 👋 Thanks for reaching out. How can I help you today?"
+};
+const intents=[[/hi|hello|hey|hallo/i,'hi'],[/ai|agent|bot|gen|llm/i,'ai'],[/career|experience|journey|job|history/i,'career'],[/award|achiev|recogn/i,'award'],[/contact|hire|reach|email|linkedin|talk/i,'contact'],[/philosoph|customer|cx|approach/i,'cx'],[/do|work|role|skill/i,'do'],[/who|about|you/i,'about']];
+const quick=[["👋 Who are you?","about"],["🛠️ What do you do?","do"],["🤖 Agentic AI","ai"],["📈 Career","career"],["❤️ CX philosophy","cx"],["📞 Talk to a human","contact"]];
+const box=$('#msgs');
+function add(text,who){const d=document.createElement('div');d.className='m '+who;d.innerHTML=text;box.appendChild(d);box.scrollTop=box.scrollHeight;return d}
+function reply(key){const t=add('<span class="typing"><i></i><i></i><i></i></span>','bot');
+ setTimeout(()=>{t.innerHTML=KB[key];box.scrollTop=box.scrollHeight;if(key==='contact'){add('🔁 Routing to: Abhishek (Human) via LinkedIn','sys');setTimeout(()=>window.open(LI,'_blank'),900)}},900)}
+function ask(text,key){add(text,'user');reply(key)}
+quick.forEach(([l,k])=>{const b=document.createElement('button');b.textContent=l;b.onclick=()=>ask(l,k);$('#quick').appendChild(b)});
+$('#form').onsubmit=e=>{e.preventDefault();const v=$('#q').value.trim();if(!v)return;$('#q').value='';
+ const hit=intents.find(([r])=>r.test(v));add(v,'user');
+ if(hit)reply(hit[1]);else{const t=add('<span class="typing"><i></i><i></i><i></i></span>','bot');setTimeout(()=>{t.innerHTML="I'm not fully sure about that one 🤔 so I won't guess. Try one of the quick replies, or say 'talk to a human'.";},900)}};
+add('Conversation started · Channel: Web Chat','sys');
+setTimeout(()=>reply('hi'),600);
+$('#launcher').onclick=()=>{location.hash='home';setTimeout(()=>$('#q').focus(),400)};
+
+/* IVR */
+const ivr={
+ '1':["👤 About me","I've spent my career in customer experience: from support engineer to delivery architect. I'm pragmatic about delivery risk and obsessed with operational quality.",["<b>Role:</b> Delivery Architect – Lead, Sprinklr","<b>Base:</b> Hamburg, Germany","<b>Focus:</b> Omnichannel CCaaS &amp; Agentic AI"]],
+ '2':["🤖 AI &amp; Automation","AI should resolve the routine and never trap a customer.",["Agentic AI and GenAI chatbots","Intent-based routing and skill transfers","Guardrails, fallbacks and graceful escalation"]],
+ '3':["📞 Voice &amp; Channels","Every channel, one consistent experience.",["IVR design with speech-to-text","Live Chat routing and bot-to-agent hand-off","WhatsApp and digital messaging"]],
+ '4':["🏗️ Platform Architecture","The behind-the-scenes work that keeps CX running at scale.",["API integrations and custom code","Reporting and analytics","Environment, sandbox and security governance"]],
+ '5':["🎤 Customer Workshops","Turning complex architecture into clear business outcomes.",["RFI and pitch workshops","Executive talk tracks","Multilingual delivery: EN, DE, FR, IT"]],
+ '6':["🏆 Recognition","Senior Implementation Consultant of the Quarter: Q1 FY2026, Business Excellence, EU CCaaS IC Team.",[]],
+ '7':["📈 Career path","IIT Dharwad → Product Support → Implementation Consultant → Senior IC → Delivery Architect – Lead.",[]],
+ '8':["❤️ CX philosophy","Customers shouldn't repeat themselves. Context should follow the customer, AI should add speed, and humans should add empathy.",[]],
+ '9':["🔁 Repeat menu","Press 1 to 8 to explore, or 0 to speak to a human.",[]],
+ '0':["🧑‍💼 Transferring to a human…","Please hold. Opening LinkedIn so you can reach Abhishek directly.",[]],
+ '*':["⭐ Hidden feature","You found the Easter egg! Every good IVR has one. ☕",[]],
+ '#':["# End call","Thanks for calling! Have a great day. 👋",[]]
+};
+const subs={1:'ABOUT',2:'AI',3:'VOICE',4:'PLATFORM',5:'WORKSHOP',6:'AWARD',7:'CAREER',8:'CX',9:'MENU',0:'HUMAN','*':'','#':''};
+let sec=0;setInterval(()=>{sec++;const s=$('#screen').innerHTML.split('<br>');s[0]='📞 Connected '+String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0');$('#screen').innerHTML=s.join('<br>')},1000);
+['1','2','3','4','5','6','7','8','9','*','0','#'].forEach(k=>{const b=document.createElement('button');b.innerHTML=k+'<small>'+subs[k]+'</small>';b.onclick=()=>press(k);$('#keys').appendChild(b)});
+function beep(){try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.frequency.value=697+Math.random()*500;g.gain.value=.05;o.connect(g);g.connect(a.destination);o.start();o.stop(a.currentTime+.12)}catch(e){}}
+function press(k){beep();const [t,p,l]=ivr[k];
+ $('#screen').innerHTML=$('#screen').innerHTML.split('<br>')[0]+'<br>&gt; You pressed '+k+'<br>&gt; '+t.replace(/<[^>]+>/g,'');
+ $('#ivrOut').innerHTML='<div class="mono" style="color:var(--cyan);font-size:.78rem">OPTION '+k+'</div><h3>'+t+'</h3><p>'+p+'</p>'+(l.length?'<ul>'+l.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'');
+ $$('.keys button').forEach(b=>b.classList.toggle('hit',b.textContent.startsWith(k)));
+ if(k==='0')setTimeout(()=>window.open(LI,'_blank'),1200)}
+press('9');
+addEventListener('keydown',e=>{if(document.activeElement.tagName==='INPUT')return;if(ivr[e.key]){press(e.key);toast('Keypad '+e.key+' pressed')}});
+
+/* Routing dots */
+const paths=[["M180 43 C 300 43, 300 190, 400 190","M560 190 C 660 190, 660 80, 760 80"],["M180 113 C 300 113, 300 190, 400 190","M560 190 L 760 190"],["M180 183 L 400 190","M560 190 C 660 190, 660 80, 760 80"],["M180 253 C 300 253, 300 190, 400 190","M560 190 C 660 190, 660 300, 760 300"],["M180 323 C 300 323, 300 190, 400 190","M560 190 L 760 190"]];
+const cols=['#22c55e','#3b82f6','#22d3ee','#f59e0b','#ec4899'];
+function spawn(){const i=Math.floor(Math.random()*5),ns='http://www.w3.org/2000/svg';
+ paths[i].forEach((d,j)=>{const c=document.createElementNS(ns,'circle');c.setAttribute('r',6);c.setAttribute('fill',cols[i]);
+  const m=document.createElementNS(ns,'animateMotion');m.setAttribute('dur','1.6s');m.setAttribute('begin',(j*1.6)+'s');m.setAttribute('fill','freeze');m.setAttribute('path',d);
+  c.setAttribute('opacity',j?0:1);if(j){const s=document.createElementNS(ns,'set');s.setAttribute('attributeName','opacity');s.setAttribute('to','1');s.setAttribute('begin','1.6s');c.appendChild(s)}
+  c.appendChild(m);$('#dots').appendChild(c);m.beginElement&&setTimeout(()=>c.remove(),3400)})}
+setInterval(spawn,700);
+
+/* Wallboard */
+let routed=1240;
+$$('.spark').forEach(s=>{for(let i=0;i<14;i++){const b=document.createElement('i');b.style.height=(20+Math.random()*80)+'%';s.appendChild(b)}});
+setInterval(()=>{routed+=Math.floor(Math.random()*4)+1;$('#k3').textContent=routed.toLocaleString('en-GB');$('#k5').textContent=(Math.random()*4+1).toFixed(1)+'s';
+ $$('.spark').forEach(s=>{s.firstChild.remove();const b=document.createElement('i');b.style.height=(20+Math.random()*80)+'%';s.appendChild(b)})},1500);
+let ch=0;const ci=setInterval(()=>{$('#k1').textContent=++ch;if(ch>=5)clearInterval(ci)},250);
+
+/* Cases */
+$$('.case').forEach(c=>c.onclick=()=>c.classList.toggle('open'));
+
+/* CSAT */
+const fbt={1:"Sorry to hear that! Escalating to a supervisor (me) 😅 Tell me how to improve on LinkedIn.",2:"Thanks for the honest feedback. Continuous improvement is part of the job!",3:"Glad it helped! 🙂",4:"Awesome, thank you! 😄 Let's connect.",5:"🤩 CSAT 5/5! You just made my wallboard turn green."};
+$$('.faces button').forEach(b=>b.onclick=()=>{$('#fbMsg').textContent=fbt[b.dataset.v];if(b.dataset.v==5)confetti()});
+function confetti(){for(let i=0;i<60;i++){const d=document.createElement('div');d.textContent=['⭐','🎧','💬','✨'][i%4];
+ Object.assign(d.style,{position:'fixed',left:Math.random()*100+'vw',top:'-30px',fontSize:'1.3rem',zIndex:80,transition:'transform 2.4s ease-in,opacity 2.4s',pointerEvents:'none'});
+ document.body.appendChild(d);requestAnimationFrame(()=>{d.style.transform='translateY('+(innerHeight+60)+'px) rotate('+(Math.random()*720)+'deg)';d.style.opacity=0});setTimeout(()=>d.remove(),2600)}}
+
+/* Reveal + nav */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('show');io.unobserve(e.target)}}),{threshold:.12});
+$$('.reveal').forEach(e=>io.observe(e));
+addEventListener('scroll',()=>{let cur='';$$('section,header').forEach(s=>{if(scrollY>=s.offsetTop-120)cur=s.id});$$('.navlinks a').forEach(a=>a.classList.toggle('on',a.hash==='#'+cur))});
+$('#yr').textContent=new Date().getFullYear();
+</script>
+</body>
+</html>
